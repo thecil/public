@@ -53,7 +53,7 @@ CONTRACT dogs : public contract {
   TABLE dog{
     int id; //unique ID for index
     name owner; //eos account name, owner of dogs
-    std::vector<dogrow> rows; //get and set all data from struct dog_stats.hpp
+    std::vector<dogrow> rows; //get and set all data from struct dog.hpp
 
     //get primary key by ID variable
     uint64_t primary_key() const{return id;}
