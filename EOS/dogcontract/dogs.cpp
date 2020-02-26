@@ -1,6 +1,11 @@
 #include <vector>
 #include <string>
 #include <eosio/eosio.hpp>
+#include <eosio/time.hpp>
+#include <eosio/system.hpp>
+
+
+uint8_t dog_hp = 100;
 
 using namespace std;
 using namespace eosio;
@@ -19,6 +24,8 @@ CONTRACT dogs : public contract {
   ** Owner can not be changed in this function.
   */
   ACTION insdog(name owner, std::string dog_name, std::string dog_img, uint8_t dog_age) {
+    //get time microseconds
+    auto dog_time = time_point(current_time_point()); 
     //Require auth of the owner
     require_auth(owner);
     //Get the index of our table
@@ -28,12 +35,14 @@ CONTRACT dogs : public contract {
     dogtable.emplace(owner, [&](auto& target) {
       target.id = dogtable.available_primary_key();
       target.owner = owner;
-      //create a dogrow and set and the end(push_back) values
+      //create a dogrow and set at the end(push_back) values
       target.rows.push_back({
         dog_name,
         dog_img,
-        dog_age
+        dog_age,
+        dog_hp
       });
+      target.created_at = dog_time;
     });
 
   }//end ACTION insdog
@@ -60,7 +69,8 @@ CONTRACT dogs : public contract {
       target.rows.push_back({
         dog_name,
         dog_img,
-        dog_age
+        dog_age,
+        dog_hp
       });
       
     });
@@ -101,11 +111,33 @@ CONTRACT dogs : public contract {
     }
   }//end ACTION rmadog
 
+/*
+
+ // Find the record from  table
   ACTION getdog(name from){
-  // Find the record from  table
-    //auto dog_itr = dogtable.find(from.value);
+    
+    
+    //Get the index of our table
+    dog_index dogtable(get_self(), get_self().value); //this is an scope
+    //Fetch the current data of our dog
+    auto dog = dogtable.get(dog_id, "Unable to fetch dog.");
+    //Require auth of the owner
+    require_auth(dog.owner);
+
+
   }
 
+    
+  //table accounts data
+  TABLE account{
+    int id; //unique ID for index
+    name owner; //eos account name owner of this account
+    string dog_name;
+    //get primary key by ID variable
+    uint64_t primary_key() const{return id;}
+  };//end account table
+  */
+  
   //table struct dog data
   TABLE dog{
     int id; //unique ID for index
@@ -115,6 +147,8 @@ CONTRACT dogs : public contract {
     uint64_t primary_key() const{return id;}
     //get dogs by owner index
     uint64_t by_owner() const{return owner.value;}
+    time_point_sec created_at;
+    time_point_sec block_at;
   };//end table dog
 
   //define table type index
