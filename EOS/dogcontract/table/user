@@ -1,8 +1,0 @@
-
-//struct dog stats, used to set different statistics for dogs table
-struct dogrow{
-  std::string dog_name;
-  std::string dog_img; //used to set an hyperlink to set an image for dog
-  uint8_t age;
-  uint8_t hp;
-};//end struct dog_stats
